@@ -1,7 +1,4 @@
-import {
-  RegisterFactory,
-  UIFactory,
-} from "./modules/Common";
+import { RegisterFactory, UIFactory } from "./modules/Common";
 import { config } from "../package.json";
 import { getString, initLocale } from "./utils/locale";
 import { registerPrefsScripts } from "./modules/preferenceScript";
@@ -17,7 +14,7 @@ async function onStartup() {
   ]);
   initLocale();
 
-  await DataStorage.instance(TLDRFieldKey).getAsync();  // 加载TLDR数据
+  await DataStorage.instance(TLDRFieldKey).getAsync(); // 加载TLDR数据
 
   RegisterFactory.registerPrefs();
 
@@ -92,9 +89,11 @@ function onLoad() {
   (async () => {
     let needFetchItems: Zotero.Item[] = [];
     for (const lib of Zotero.Libraries.getAll()) {
-      needFetchItems = needFetchItems.concat((await Zotero.Items.getAll(lib.id)).filter((item: Zotero.Item) => {
-        return item.isRegularItem() && !item.isCollection();
-      }));
+      needFetchItems = needFetchItems.concat(
+        (await Zotero.Items.getAll(lib.id)).filter((item: Zotero.Item) => {
+          return item.isRegularItem() && !item.isCollection();
+        }),
+      );
     }
     onUpdateItems(needFetchItems, false);
   })();
@@ -102,7 +101,7 @@ function onLoad() {
 
 function noNotifyDeleteItem(ids: (string | number)[]) {
   DataStorage.instance(TLDRFieldKey).modify((data: any) => {
-    ids.forEach(id => {
+    ids.forEach((id) => {
       delete data[id];
     });
     return data;
@@ -125,11 +124,17 @@ function onNotifyAddItems(ids: (string | number)[]) {
 
 function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
   items = items.filter((item: Zotero.Item) => {
-    if (!item.getField('title')) { return false; }
-    if (!forceFetch) { return DataStorage.instance(TLDRFieldKey).get()[item.id] === undefined; }
+    if (!item.getField("title")) {
+      return false;
+    }
+    if (!forceFetch) {
+      return DataStorage.instance(TLDRFieldKey).get()[item.id] === undefined;
+    }
     return true;
   });
-  if (items.length <= 0) { return; }
+  if (items.length <= 0) {
+    return;
+  }
   const newPopWin = (closeOnClick = false) => {
     return new ztoolkit.ProgressWindow(config.addonName, {
       closeOnClick: closeOnClick,
@@ -138,7 +143,7 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
       type: "default",
       progress: 0,
     });
-  }
+  };
   const popupWin = newPopWin().show(-1);
   (async function () {
     const count = items.length;
@@ -146,12 +151,16 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
     const succeedItems: Zotero.Item[] = [];
     await (async function () {
       for (const [index, item] of items.entries()) {
-        await new TLDRFetcher(item).fetchTLDR() ? succeedItems.push(item) : failedItems.push(item);
+        (await new TLDRFetcher(item).fetchTLDR())
+          ? succeedItems.push(item)
+          : failedItems.push(item);
         await Zotero.Promise.delay(50);
         ztoolkit.ItemBox.refresh();
         popupWin.changeLine({
-          progress: index * 100 / count,
-          text: `Waiting: ${count - index - 1}, succeed: ${succeedItems.length}, failed: ${failedItems.length}`,
+          progress: (index * 100) / count,
+          text: `Waiting: ${count - index - 1}, succeed: ${
+            succeedItems.length
+          }, failed: ${failedItems.length}`,
         });
       }
     })();

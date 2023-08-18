@@ -11,7 +11,7 @@ export class RegisterFactory {
         event: string,
         type: string,
         ids: number[] | string[],
-        extraData: { [key: string]: any }
+        extraData: { [key: string]: any },
       ) => {
         if (!addon?.data.alive) {
           this.unregisterNotifier(notifierID);
@@ -22,9 +22,7 @@ export class RegisterFactory {
     };
 
     // Register the callback in Zotero as an item observer
-    const notifierID = Zotero.Notifier.registerObserver(callback, [
-      "item",
-    ]);
+    const notifierID = Zotero.Notifier.registerObserver(callback, ["item"]);
 
     // Unregister callback when the window closes (important to avoid a memory leak)
     window.addEventListener(
@@ -32,14 +30,13 @@ export class RegisterFactory {
       (e: Event) => {
         this.unregisterNotifier(notifierID);
       },
-      false
+      false,
     );
   }
 
   private static unregisterNotifier(notifierID: string) {
     Zotero.Notifier.unregisterObserver(notifierID);
   }
-
 
   // 注册首选项配置
   static registerPrefs() {
@@ -79,9 +76,13 @@ export class UIFactory {
       tag: "menuitem",
       id: "zotero-collectionmenu-tldr",
       label: getString("menucollection-updatetldrlabel"),
-      commandListener: (ev) => addon.hooks.onUpdateItems(ZoteroPane.getSelectedCollection()?.getChildItems() ?? [], false),
+      commandListener: (ev) =>
+        addon.hooks.onUpdateItems(
+          ZoteroPane.getSelectedCollection()?.getChildItems() ?? [],
+          false,
+        ),
       icon: menuIcon,
-    })
+    });
   }
 
   // tldr行

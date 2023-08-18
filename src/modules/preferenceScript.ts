@@ -14,5 +14,4 @@ export async function registerPrefsScripts(_window: Window) {
   bindPrefEvents();
 }
 
-function bindPrefEvents() {
-}
+function bindPrefEvents() {}
