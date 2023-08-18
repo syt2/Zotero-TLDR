@@ -92,13 +92,15 @@ export class UIFactory {
       (field, unformatted, includeBaseMapped, item, original) => {
         const tldrInfo = DataStorage.instance(TLDRFieldKey).get()[item.id];
         if (tldrInfo === TLDRUnrelated) {
-            return getString(TLDRUnrelated);
+          return "";
+          // return getString(TLDRUnrelated);
         } else if (tldrInfo === TLDRItemNotFound) {
-            return getString(TLDRItemNotFound);
+          return "";
+          // return getString(TLDRItemNotFound);
         } else if (tldrInfo) {
-            return tldrInfo;
+          return tldrInfo;
         } else {
-            return "";
+          return "";
         }
       },
       {

@@ -67,6 +67,8 @@ async function onNotify(
   Zotero.log(`${event} ${type} ${ids}, ${extraData}`);
   if (event == "add" && type == "item" && ids.length > 0) {
     onNotifyAddItems(ids);
+  } else if (event == "delete" && type == "item" && ids.length > 0) {
+    noNotifyDeleteItem(ids);
   }
 }
 
@@ -96,6 +98,15 @@ function onLoad() {
     }
     onUpdateItems(needFetchItems, false);
   })();
+}
+
+function noNotifyDeleteItem(ids: (string | number)[]) {
+  DataStorage.instance(TLDRFieldKey).modify((data: any) => {
+    ids.forEach(id => {
+      delete data[id];
+    });
+    return data;
+  });
 }
 
 function onNotifyAddItems(ids: (string | number)[]) {
@@ -136,6 +147,7 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
     await (async function () {
       for (const [index, item] of items.entries()) {
         await new TLDRFetcher(item).fetchTLDR() ? succeedItems.push(item) : failedItems.push(item);
+        await Zotero.Promise.delay(50);
         ztoolkit.ItemBox.refresh();
         popupWin.changeLine({
           progress: index * 100 / count,
