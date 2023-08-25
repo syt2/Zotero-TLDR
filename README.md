@@ -7,7 +7,7 @@ This is an add-on for [Zotero 7+](https://www.zotero.org) that automatically fet
 
 ## Install
 
-1. Download the [latest release](https://github.com/syt2/zotero-tldr/latest/download/zotero-tldr.xpi) xpi file.
+1. Download the [latest release](https://github.com/syt2/zotero-tldr/releases/latest/download/zotero-tldr.xpi) xpi file.
 2. Install in Zotero (Tools -> Add-ons)
 
 ## Usage
