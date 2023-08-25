@@ -3,8 +3,8 @@ import { config } from "../package.json";
 import { getString, initLocale } from "./utils/locale";
 import { registerPrefsScripts } from "./modules/preferenceScript";
 import { createZToolkit } from "./utils/ztoolkit";
-import { TLDRFetcher, TLDRFieldKey } from "./modules/tldrFetcher";
-import { Data, DataStorage } from "./modules/dataStorage";
+import { tldrs } from "./modules/dataStorage";
+import { TLDRFetcher } from "./modules/tldrFetcher";
 
 async function onStartup() {
   await Promise.all([
@@ -14,7 +14,7 @@ async function onStartup() {
   ]);
   initLocale();
 
-  await DataStorage.instance(TLDRFieldKey).getAsync(); // 加载TLDR数据
+  await tldrs.getAsync();
 
   RegisterFactory.registerPrefs();
 
@@ -100,7 +100,7 @@ function onLoad() {
 }
 
 function noNotifyDeleteItem(ids: (string | number)[]) {
-  DataStorage.instance(TLDRFieldKey).modify((data: any) => {
+  tldrs.modify(data => {
     ids.forEach((id) => {
       delete data[id];
     });
@@ -128,18 +128,18 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
       return false;
     }
     if (!forceFetch) {
-      return DataStorage.instance(TLDRFieldKey).get()[item.id] === undefined;
+      return tldrs.get()[item.id] === undefined
     }
     return true;
   });
   if (items.length <= 0) {
     return;
   }
-  const newPopWin = (closeOnClick = false) => {
+  const newPopWin = (closeOnClick = true) => {
     return new ztoolkit.ProgressWindow(config.addonName, {
       closeOnClick: closeOnClick,
     }).createLine({
-      text: `Waiting: ${items.length}, succeed: 0, failed: 0`,
+      text: `${getString("popWindow-waiting")}: ${items.length}; ${getString("popWindow-succeed")}: 0; ${getString("popWindow-failed")}: 0`,
       type: "default",
       progress: 0,
     });
@@ -158,9 +158,7 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
         ztoolkit.ItemBox.refresh();
         popupWin.changeLine({
           progress: (index * 100) / count,
-          text: `Waiting: ${count - index - 1}, succeed: ${
-            succeedItems.length
-          }, failed: ${failedItems.length}`,
+          text: `${getString("popWindow-waiting")}: ${count - index - 1}; ${getString("popWindow-succeed")}: ${succeedItems.length}; ${getString("popWindow-failed")}: ${failedItems.length}`,
         });
       }
     })();
@@ -169,7 +167,7 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
       popupWin.changeLine({
         type: "success",
         progress: 100,
-        text: `Success: ${succeedItems.length}\nFailed: ${failedItems.length}`,
+        text: `${getString("popWindow-succeed")}: ${succeedItems.length}; ${getString("popWindow-failed")}: ${failedItems.length}`,
       });
       popupWin.startCloseTimer(3000);
     })();

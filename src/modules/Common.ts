@@ -1,7 +1,6 @@
 import { config } from "../../package.json";
 import { getString } from "../utils/locale";
-import { DataStorage } from "./dataStorage";
-import { TLDRFieldKey, TLDRItemNotFound, TLDRUnrelated } from "./tldrFetcher";
+import { tldrs, TLDRItemNotFound, TLDRUnrelated } from "./dataStorage";
 
 export class RegisterFactory {
   // 注册zotero的通知
@@ -88,16 +87,14 @@ export class UIFactory {
   // tldr行
   static async registerTLDRItemBoxRow() {
     await ztoolkit.ItemBox.register(
-      TLDRFieldKey,
+      "TLDR",
       getString("itembox-tldrlabel"),
       (field, unformatted, includeBaseMapped, item, original) => {
-        const tldrInfo = DataStorage.instance(TLDRFieldKey).get()[item.id];
+        const tldrInfo = tldrs.get()[item.id];
         if (tldrInfo === TLDRUnrelated) {
-          return "";
-          // return getString(TLDRUnrelated);
+          return getString(TLDRUnrelated);
         } else if (tldrInfo === TLDRItemNotFound) {
-          return "";
-          // return getString(TLDRItemNotFound);
+          return getString(TLDRItemNotFound);
         } else if (tldrInfo) {
           return tldrInfo;
         } else {
@@ -108,7 +105,7 @@ export class UIFactory {
         editable: true,
         setFieldHook: (field, value, loadIn, item, original) => {
           (async () => {
-            await DataStorage.instance(TLDRFieldKey).modify((data: any) => {
+            await tldrs.modify((data: any) => {
               data[item.id] = value;
               return data;
             });

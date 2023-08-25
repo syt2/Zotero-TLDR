@@ -1,14 +1,10 @@
-import { DataStorage } from "./dataStorage";
+import { tldrs, TLDRUnrelated, TLDRItemNotFound } from "./dataStorage";
 
 type SemanticScholarItemInfo = {
   title?: string;
   abstract?: string;
   tldr?: string;
 };
-
-export const TLDRFieldKey = "TLDR";
-export const TLDRUnrelated = "tldr-unrelated"; // semantic scholar 找到了该item，但是该item没有tldr
-export const TLDRItemNotFound = "tldr-itemnotfound"; // semantic scholar 找不到该item，
 
 export class TLDRFetcher {
   private readonly zoteroItem: Zotero.Item;
@@ -42,14 +38,14 @@ export class TLDRFetcher {
         }
         if (match) {
           const result = info.tldr ?? TLDRUnrelated;
-          DataStorage.instance(TLDRFieldKey).modify((data: any) => {
+          tldrs.modify((data: any) => {
             data[this.zoteroItem.id] = result;
             return data;
           });
           return true;
         }
       }
-      DataStorage.instance(TLDRFieldKey).modify((data: any) => {
+      tldrs.modify((data: any) => {
         data[this.zoteroItem.id] = TLDRItemNotFound;
         return data;
       });

@@ -1,12 +1,13 @@
 import { config } from "../../package.json";
 
-export class Data {
+export class Data<K extends string | number | symbol, V> {
+  [x: string]: any;
   private filePath: string;
-  private inited = false;
-  private _data: any;
+  private _data: Record<K, V>;
 
   constructor(filePath: string) {
     this.filePath = filePath;
+    this._data = {} as Record<K, V>;
   }
 
   async getAsync() {
@@ -18,9 +19,9 @@ export class Data {
     return this.data;
   }
 
-  async modify(action: (data: any) => Promise<any>) {
+  async modify(action: (data: Record<K, V>) => Record<K, V> | Promise<Record<K, V>>) {
     await this.initDataIfNeed();
-    const data = await this.data;
+    const data = this.data;
     const newData = await action(data);
     try {
       await IOUtils.writeJSON(this.filePath, newData, {
@@ -37,7 +38,7 @@ export class Data {
   async delete() {
     try {
       await IOUtils.remove(this.filePath);
-      this.data = {};
+      this.data = {} as Record<K, V>;
       return true;
     } catch (error) {
       return false;
@@ -48,18 +49,17 @@ export class Data {
     return this._data;
   }
 
-  private set data(value: any) {
+  private set data(value: Record<K, V>) {
     this._data = value;
   }
 
   private async initDataIfNeed() {
-    if (this.inited) {
-      return;
-    }
+    if (this.inited) { return; }
+    this.inited = true;
     try {
       this.data = await IOUtils.readJSON(this.filePath, { decompress: false });
     } catch (error) {
-      this.data = {};
+      this.data = {} as Record<K, V>;
     }
   }
 }
@@ -70,14 +70,14 @@ export class DataStorage {
     "extensions",
     config.addonName,
   );
-  private dataMap: { [key: string]: Data } = {};
+  private dataMap: { [key: string]: Data<any, any> } = {};
 
   private static shared = new DataStorage();
 
-  static instance(dataType: string) {
+  static instance<K extends string | number | symbol, V>(dataType: string): Data<K, V> {
     const path = PathUtils.join(this.shared.dataDir, dataType);
     if (this.shared.dataMap[dataType] === undefined) {
-      const data = new Data(path);
+      const data = new Data<K, V>(path);
       this.shared.dataMap[dataType] = data;
       return data;
     } else {
@@ -85,5 +85,11 @@ export class DataStorage {
     }
   }
 
-  private constructor() {}
+  private constructor() {
+    IOUtils.makeDirectory(this.dataDir, { createAncestors: true, ignoreExisting: true });
+  }
 }
+
+export const TLDRUnrelated = "tldr-unrelated"; // semantic scholar 找到了该item，但是该item没有tldr
+export const TLDRItemNotFound = "tldr-itemnotfound"; // semantic scholar 找不到该item
+export const tldrs = DataStorage.instance<string | number, string>('TLDR.json');
