@@ -100,7 +100,7 @@ function onLoad() {
 }
 
 function noNotifyDeleteItem(ids: (string | number)[]) {
-  tldrs.modify(data => {
+  tldrs.modify((data) => {
     ids.forEach((id) => {
       delete data[id];
     });
@@ -128,7 +128,7 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
       return false;
     }
     if (!forceFetch) {
-      return tldrs.get()[item.id] === undefined
+      return tldrs.get()[item.id] === undefined;
     }
     return true;
   });
@@ -139,7 +139,9 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
     return new ztoolkit.ProgressWindow(config.addonName, {
       closeOnClick: closeOnClick,
     }).createLine({
-      text: `${getString("popWindow-waiting")}: ${items.length}; ${getString("popWindow-succeed")}: 0; ${getString("popWindow-failed")}: 0`,
+      text: `${getString("popWindow-waiting")}: ${items.length}; ${getString(
+        "popWindow-succeed",
+      )}: 0; ${getString("popWindow-failed")}: 0`,
       type: "default",
       progress: 0,
     });
@@ -158,7 +160,11 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
         ztoolkit.ItemBox.refresh();
         popupWin.changeLine({
           progress: (index * 100) / count,
-          text: `${getString("popWindow-waiting")}: ${count - index - 1}; ${getString("popWindow-succeed")}: ${succeedItems.length}; ${getString("popWindow-failed")}: ${failedItems.length}`,
+          text: `${getString("popWindow-waiting")}: ${
+            count - index - 1
+          }; ${getString("popWindow-succeed")}: ${
+            succeedItems.length
+          }; ${getString("popWindow-failed")}: ${failedItems.length}`,
         });
       }
     })();
@@ -167,7 +173,9 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
       popupWin.changeLine({
         type: "success",
         progress: 100,
-        text: `${getString("popWindow-succeed")}: ${succeedItems.length}; ${getString("popWindow-failed")}: ${failedItems.length}`,
+        text: `${getString("popWindow-succeed")}: ${
+          succeedItems.length
+        }; ${getString("popWindow-failed")}: ${failedItems.length}`,
       });
       popupWin.startCloseTimer(3000);
     })();

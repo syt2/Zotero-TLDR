@@ -19,7 +19,9 @@ export class Data<K extends string | number | symbol, V> {
     return this.data;
   }
 
-  async modify(action: (data: Record<K, V>) => Record<K, V> | Promise<Record<K, V>>) {
+  async modify(
+    action: (data: Record<K, V>) => Record<K, V> | Promise<Record<K, V>>,
+  ) {
     await this.initDataIfNeed();
     const data = this.data;
     const newData = await action(data);
@@ -54,7 +56,9 @@ export class Data<K extends string | number | symbol, V> {
   }
 
   private async initDataIfNeed() {
-    if (this.inited) { return; }
+    if (this.inited) {
+      return;
+    }
     this.inited = true;
     try {
       this.data = await IOUtils.readJSON(this.filePath, { decompress: false });
@@ -74,7 +78,9 @@ export class DataStorage {
 
   private static shared = new DataStorage();
 
-  static instance<K extends string | number | symbol, V>(dataType: string): Data<K, V> {
+  static instance<K extends string | number | symbol, V>(
+    dataType: string,
+  ): Data<K, V> {
     const path = PathUtils.join(this.shared.dataDir, dataType);
     if (this.shared.dataMap[dataType] === undefined) {
       const data = new Data<K, V>(path);
@@ -86,10 +92,13 @@ export class DataStorage {
   }
 
   private constructor() {
-    IOUtils.makeDirectory(this.dataDir, { createAncestors: true, ignoreExisting: true });
+    IOUtils.makeDirectory(this.dataDir, {
+      createAncestors: true,
+      ignoreExisting: true,
+    });
   }
 }
 
 export const TLDRUnrelated = "tldr-unrelated"; // semantic scholar 找到了该item，但是该item没有tldr
 export const TLDRItemNotFound = "tldr-itemnotfound"; // semantic scholar 找不到该item
-export const tldrs = DataStorage.instance<string | number, string>('TLDR.json');
+export const tldrs = DataStorage.instance<string | number, string>("TLDR.json");
