@@ -1,6 +1,6 @@
 {
   "name": "zotero-tldr",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "TLDR(too long; didn't read) from sematic scholar",
   "config": {
     "addonName": "Zotero TLDR",
