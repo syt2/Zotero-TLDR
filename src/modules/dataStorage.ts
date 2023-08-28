@@ -2,11 +2,12 @@ import { config } from "../../package.json";
 
 export class Data<K extends string | number | symbol, V> {
   [x: string]: any;
-  private filePath: string;
+  private dataType: string;
+  private filePath?: string;
   private _data: Record<K, V>;
 
-  constructor(filePath: string) {
-    this.filePath = filePath;
+  constructor(dataType: string) {
+    this.dataType = dataType;
     this._data = {} as Record<K, V>;
   }
 
@@ -25,25 +26,35 @@ export class Data<K extends string | number | symbol, V> {
     await this.initDataIfNeed();
     const data = this.data;
     const newData = await action(data);
-    try {
-      await IOUtils.writeJSON(this.filePath, newData, {
-        mode: "overwrite",
-        compress: false,
-      });
+    if (this.filePath) {
+      try {
+        await IOUtils.writeJSON(this.filePath, newData, {
+          mode: "overwrite",
+          compress: false,
+        });
+        this.data = newData;
+        return newData;
+      } catch (error) {
+        return data;
+      }
+    } else {
       this.data = newData;
       return newData;
-    } catch (error) {
-      return data;
     }
   }
 
   async delete() {
-    try {
-      await IOUtils.remove(this.filePath);
+    if (this.filePath) {
+      try {
+        await IOUtils.remove(this.filePath);
+        this.data = {} as Record<K, V>;
+        return true;
+      } catch (error) {
+        return false;
+      }
+    } else {
       this.data = {} as Record<K, V>;
       return true;
-    } catch (error) {
-      return false;
     }
   }
 
@@ -60,6 +71,24 @@ export class Data<K extends string | number | symbol, V> {
       return;
     }
     this.inited = true;
+
+    const prefsFile = PathUtils.join(PathUtils.profileDir, "prefs.js");
+    const prefs = await Zotero.Profile.readPrefsFromFile(prefsFile);
+    let dir = prefs["extensions.zotero.dataDir"];
+    if (dir) {
+      dir = PathUtils.join(dir, config.addonName);
+    } else {
+      dir = PathUtils.join(
+        PathUtils.profileDir,
+        "extensions",
+        config.addonName,
+      );
+    }
+    IOUtils.makeDirectory(dir, {
+      createAncestors: true,
+      ignoreExisting: true,
+    });
+    this.filePath = PathUtils.join(dir, this.dataType);
     try {
       this.data = await IOUtils.readJSON(this.filePath, { decompress: false });
     } catch (error) {
@@ -69,11 +98,6 @@ export class Data<K extends string | number | symbol, V> {
 }
 
 export class DataStorage {
-  private readonly dataDir = PathUtils.join(
-    PathUtils.profileDir,
-    "extensions",
-    config.addonName,
-  );
   private dataMap: { [key: string]: Data<any, any> } = {};
 
   private static shared = new DataStorage();
@@ -81,9 +105,8 @@ export class DataStorage {
   static instance<K extends string | number | symbol, V>(
     dataType: string,
   ): Data<K, V> {
-    const path = PathUtils.join(this.shared.dataDir, dataType);
     if (this.shared.dataMap[dataType] === undefined) {
-      const data = new Data<K, V>(path);
+      const data = new Data<K, V>(dataType);
       this.shared.dataMap[dataType] = data;
       return data;
     } else {
@@ -92,10 +115,7 @@ export class DataStorage {
   }
 
   private constructor() {
-    IOUtils.makeDirectory(this.dataDir, {
-      createAncestors: true,
-      ignoreExisting: true,
-    });
+    // empty
   }
 }
 
