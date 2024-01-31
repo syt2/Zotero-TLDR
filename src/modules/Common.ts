@@ -1,6 +1,5 @@
 import { config } from "../../package.json";
 import { getString } from "../utils/locale";
-import { tldrs, TLDRItemNotFound, TLDRUnrelated } from "./dataStorage";
 
 export class RegisterFactory {
   // 注册zotero的通知
@@ -36,19 +35,6 @@ export class RegisterFactory {
   private static unregisterNotifier(notifierID: string) {
     Zotero.Notifier.unregisterObserver(notifierID);
   }
-
-  // 注册首选项配置
-  static registerPrefs() {
-    // const prefOptions = {
-    //   pluginID: config.addonID,
-    //   src: rootURI + "chrome/content/preferences.xhtml",
-    //   label: getString("prefs.title"),
-    //   image: `chrome://${config.addonRef}/content/icons/favicon.png`,
-    //   extraDTD: [`chrome://${config.addonRef}/locale/overlay.dtd`],
-    //   defaultXUL: true,
-    // };
-    // ztoolkit.PreferencePane.register(prefOptions);
-  }
 }
 
 export class UIFactory {
@@ -82,40 +68,5 @@ export class UIFactory {
         ),
       icon: menuIcon,
     });
-  }
-
-  // tldr行
-  static async registerTLDRItemBoxRow() {
-    await ztoolkit.ItemBox.register(
-      "TLDR",
-      getString("itembox-tldrlabel"),
-      (field, unformatted, includeBaseMapped, item, original) => {
-        const tldrInfo = tldrs.get()[item.id];
-        if (tldrInfo === TLDRUnrelated) {
-          return getString(TLDRUnrelated);
-        } else if (tldrInfo === TLDRItemNotFound) {
-          return getString(TLDRItemNotFound);
-        } else if (tldrInfo) {
-          return tldrInfo;
-        } else {
-          return "";
-        }
-      },
-      {
-        editable: true,
-        setFieldHook: (field, value, loadIn, item, original) => {
-          (async () => {
-            await tldrs.modify((data: any) => {
-              data[item.id] = value;
-              return data;
-            });
-            ztoolkit.ItemBox.refresh();
-          })();
-          return true;
-        },
-        index: 2,
-        multiline: true,
-      },
-    );
   }
 }

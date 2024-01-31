@@ -1,4 +1,4 @@
-import { tldrs, TLDRUnrelated, TLDRItemNotFound } from "./dataStorage";
+import { tldrs } from "./dataStorage";
 
 type SemanticScholarItemInfo = {
   title?: string;
@@ -23,6 +23,7 @@ export class TLDRFetcher {
     if (!this.title || this.title.length <= 0) {
       return false;
     }
+    const noteKey = (await tldrs.getAsync())[this.zoteroItem.key];
     try {
       const infos = await this.fetchRelevanceItemInfos(this.title);
       for (const info of infos) {
@@ -36,23 +37,30 @@ export class TLDRFetcher {
         ) {
           match = true;
         }
-        if (match) {
-          const result = info.tldr ?? TLDRUnrelated;
-          tldrs.modify((data: any) => {
-            data[this.zoteroItem.id] = result;
+        if (match && info.tldr) {
+          let note = new Zotero.Item('note');
+          if (noteKey) {
+            const obj = Zotero.Items.getByLibraryAndKey(this.zoteroItem.libraryID, noteKey);
+            if (obj && obj instanceof Zotero.Item && this.zoteroItem.getNotes().includes(obj.id)) {
+              note = obj;
+            }
+          }
+          note.setNote(`<p>TL;DR</p>\n<p>${info.tldr}</p>`)
+          note.parentID = this.zoteroItem.id;
+          await note.saveTx();
+          await tldrs.modify((data: any) => {
+            data[this.zoteroItem.key] = note.key;
             return data;
           });
-          return true;
+          return true
         }
       }
-      tldrs.modify((data: any) => {
-        data[this.zoteroItem.id] = TLDRItemNotFound;
+      await tldrs.modify((data: any) => {
+        data[this.zoteroItem.key] = false;
         return data;
       });
-      return false;
     } catch (error) {
       Zotero.log(`post semantic scholar request error: ${error}`);
-      return false;
     }
   }
 

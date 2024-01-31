@@ -119,6 +119,4 @@ export class DataStorage {
   }
 }
 
-export const TLDRUnrelated = "tldr-unrelated"; // semantic scholar 找到了该item，但是该item没有tldr
-export const TLDRItemNotFound = "tldr-itemnotfound"; // semantic scholar 找不到该item
-export const tldrs = DataStorage.instance<string | number, string>("TLDR.json");
+export const tldrs = DataStorage.instance<string, string | false>("fetchedItems.json");

@@ -16,8 +16,6 @@ async function onStartup() {
 
   await tldrs.getAsync();
 
-  RegisterFactory.registerPrefs();
-
   RegisterFactory.registerNotifier();
 
   await onMainWindowLoad(window);
@@ -32,8 +30,6 @@ async function onMainWindowLoad(win: Window): Promise<void> {
   UIFactory.registerRightClickMenuItem();
 
   UIFactory.registerRightClickCollectionMenuItem();
-
-  await UIFactory.registerTLDRItemBoxRow();
 
   onLoad();
 }
@@ -127,8 +123,8 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
     if (!item.getField("title")) {
       return false;
     }
-    if (!forceFetch) {
-      return tldrs.get()[item.id] === undefined;
+    if (!forceFetch && (item.key in tldrs.get())) {
+      return false;
     }
     return true;
   });
