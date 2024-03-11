@@ -41,7 +41,7 @@
   },
   "homepage": "https://github.com/syt2/zotero-tldr#readme",
   "dependencies": {
-    "zotero-plugin-toolkit": "^2.2.2"
+    "zotero-plugin-toolkit": "^2.3.25"
   },
   "devDependencies": {
     "@types/node": "^20.4.2",
