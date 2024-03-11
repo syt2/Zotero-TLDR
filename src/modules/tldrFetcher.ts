@@ -38,21 +38,28 @@ export class TLDRFetcher {
           match = true;
         }
         if (match && info.tldr) {
-          let note = new Zotero.Item('note');
+          let note = new Zotero.Item("note");
           if (noteKey) {
-            const obj = Zotero.Items.getByLibraryAndKey(this.zoteroItem.libraryID, noteKey);
-            if (obj && obj instanceof Zotero.Item && this.zoteroItem.getNotes().includes(obj.id)) {
+            const obj = Zotero.Items.getByLibraryAndKey(
+              this.zoteroItem.libraryID,
+              noteKey,
+            );
+            if (
+              obj &&
+              obj instanceof Zotero.Item &&
+              this.zoteroItem.getNotes().includes(obj.id)
+            ) {
               note = obj;
             }
           }
-          note.setNote(`<p>TL;DR</p>\n<p>${info.tldr}</p>`)
+          note.setNote(`<p>TL;DR</p>\n<p>${info.tldr}</p>`);
           note.parentID = this.zoteroItem.id;
           await note.saveTx();
           await tldrs.modify((data: any) => {
             data[this.zoteroItem.key] = note.key;
             return data;
           });
-          return true
+          return true;
         }
       }
       await tldrs.modify((data: any) => {

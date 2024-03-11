@@ -123,7 +123,7 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
     if (!item.getField("title")) {
       return false;
     }
-    if (!forceFetch && (item.key in tldrs.get())) {
+    if (!forceFetch && item.key in tldrs.get()) {
       return false;
     }
     return true;

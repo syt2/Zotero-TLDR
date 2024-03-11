@@ -119,4 +119,6 @@ export class DataStorage {
   }
 }
 
-export const tldrs = DataStorage.instance<string, string | false>("fetchedItems.json");
+export const tldrs = DataStorage.instance<string, string | false>(
+  "fetchedItems.json",
+);
