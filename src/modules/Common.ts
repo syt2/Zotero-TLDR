@@ -71,7 +71,6 @@ export class UIFactory {
     });
   }
 
-
   // tldr行
   static async registerTLDRItemBoxRow() {
     await ztoolkit.ItemBox.register(
@@ -80,20 +79,17 @@ export class UIFactory {
       (field, unformatted, includeBaseMapped, item, original) => {
         const noteKey = tldrs.get()[item.key];
         if (noteKey) {
-          const obj = Zotero.Items.getByLibraryAndKey(
-            item.libraryID,
-            noteKey,
-          );
+          const obj = Zotero.Items.getByLibraryAndKey(item.libraryID, noteKey);
           if (
             obj &&
             obj instanceof Zotero.Item &&
             item.getNotes().includes(obj.id)
           ) {
             let str = obj.getNote();
-            if (str.startsWith('<p>TL;DR</p>\n<p>')) {
-              str = str.slice('<p>TL;DR</p>\n<p>'.length);
+            if (str.startsWith("<p>TL;DR</p>\n<p>")) {
+              str = str.slice("<p>TL;DR</p>\n<p>".length);
             }
-            if (str.endsWith('</p>')) {
+            if (str.endsWith("</p>")) {
               str = str.slice(0, -4);
             }
             return str;
@@ -118,5 +114,4 @@ export class UIFactory {
       },
     );
   }
-
 }
