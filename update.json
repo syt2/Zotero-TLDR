@@ -3,7 +3,7 @@
     "zoterotldr@syt.com": {
       "updates": [
         {
-          "version": "1.0.4",
+          "version": "1.0.5",
           "update_link": "https://github.com/syt2/zotero-tldr/releases/latest/download/zotero-tldr.xpi",
           "applications": {
             "zotero": {
