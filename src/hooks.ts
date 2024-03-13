@@ -30,6 +30,8 @@ async function onMainWindowLoad(win: Window): Promise<void> {
   UIFactory.registerRightClickMenuItem();
 
   UIFactory.registerRightClickCollectionMenuItem();
+  
+  UIFactory.registerTLDRItemBoxRow();
 
   onLoad();
 }

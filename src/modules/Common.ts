@@ -1,5 +1,6 @@
 import { config } from "../../package.json";
 import { getString } from "../utils/locale";
+import { tldrs } from "./dataStorage";
 
 export class RegisterFactory {
   // 注册zotero的通知
@@ -69,4 +70,53 @@ export class UIFactory {
       icon: menuIcon,
     });
   }
+
+
+  // tldr行
+  static async registerTLDRItemBoxRow() {
+    await ztoolkit.ItemBox.register(
+      "TLDR",
+      getString("itembox-tldrlabel"),
+      (field, unformatted, includeBaseMapped, item, original) => {
+        const noteKey = tldrs.get()[item.key];
+        if (noteKey) {
+          const obj = Zotero.Items.getByLibraryAndKey(
+            item.libraryID,
+            noteKey,
+          );
+          if (
+            obj &&
+            obj instanceof Zotero.Item &&
+            item.getNotes().includes(obj.id)
+          ) {
+            let str = obj.getNote();
+            if (str.startsWith('<p>TL;DR</p>\n<p>')) {
+              str = str.slice('<p>TL;DR</p>\n<p>'.length);
+            }
+            if (str.endsWith('</p>')) {
+              str = str.slice(0, -4);
+            }
+            return str;
+          }
+        }
+        return "";
+      },
+      {
+        editable: true,
+        setFieldHook: (field, value, loadIn, item, original) => {
+          (async () => {
+            await tldrs.modify((data: any) => {
+              data[item.id] = value;
+              return data;
+            });
+            ztoolkit.ItemBox.refresh();
+          })();
+          return true;
+        },
+        index: 2,
+        multiline: true,
+      },
+    );
+  }
+
 }
