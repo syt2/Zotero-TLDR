@@ -33,6 +33,10 @@ async function onMainWindowLoad(win: Window): Promise<void> {
   // Create ztoolkit for every window
   addon.data.ztoolkit = createZToolkit();
 
+  (win as any).MozXULElement.insertFTLIfNeeded(
+    `${config.addonRef}-mainWindow.ftl`,
+  );
+
   UIFactory.registerRightClickMenuItem();
 
   UIFactory.registerRightClickCollectionMenuItem();

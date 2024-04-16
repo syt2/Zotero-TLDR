@@ -73,7 +73,28 @@ export class UIFactory {
 
   // tldr行
   static async registerTLDRItemBoxRow() {
-    const registeredID = Zotero.ItemPaneManager.registerSection({
+    const itemTLDR = (item: Zotero.Item) => {
+      const noteKey = tldrs.get()[item.key];
+      if (noteKey) {
+        const obj = Zotero.Items.getByLibraryAndKey(item.libraryID, noteKey);
+        if (
+          obj &&
+          obj instanceof Zotero.Item &&
+          item.getNotes().includes(obj.id)
+        ) {
+          let str = obj.getNote();
+          if (str.startsWith("<p>TL;DR</p>\n<p>")) {
+            str = str.slice("<p>TL;DR</p>\n<p>".length);
+          }
+          if (str.endsWith("</p>")) {
+            str = str.slice(0, -4);
+          }
+          return str;
+        }
+      }
+      return "";
+    }
+    Zotero.ItemPaneManager.registerSection({
       paneID: config.addonRef,
       pluginID: config.addonID,
       header: {
@@ -84,74 +105,11 @@ export class UIFactory {
         l10nID: `${config.addonRef}-itemPaneSection-sidenav`,
         icon: `chrome://${config.addonRef}/content/icons/favicon@20.png`,
       },
-      onRender: ({ body, item, editable, tabType }: any) => {
-        const noteKey = tldrs.get()[item.key];
-        let str = "";
-        if (noteKey) {
-          const obj = Zotero.Items.getByLibraryAndKey(item.libraryID, noteKey);
-          if (
-            obj &&
-            obj instanceof Zotero.Item &&
-            item.getNotes().includes(obj.id)
-          ) {
-            str = obj.getNote();
-            if (str.startsWith("<p>TL;DR</p>\n<p>")) {
-              str = str.slice("<p>TL;DR</p>\n<p>".length);
-            }
-            if (str.endsWith("</p>")) {
-              str = str.slice(0, -4);
-            }
-          }
-        }
-        body.textContent = str;
-        // body.textContent
-        //   = JSON.stringify({
-        //     id: item?.id,
-        //     editable,
-        //     tabType,
-        //   });
+      onRender: ({ body, item }: any) => {
+        let tldr = itemTLDR(item);
+        if (tldr.length <= 0 && item.parentItem) { tldr = itemTLDR(item.parentItem); }
+        body.textContent = tldr;
       },
     });
-    return;
-    await ztoolkit.ItemBox.register(
-      "TLDR",
-      getString("itembox-tldrlabel"),
-      (field, unformatted, includeBaseMapped, item, original) => {
-        const noteKey = tldrs.get()[item.key];
-        if (noteKey) {
-          const obj = Zotero.Items.getByLibraryAndKey(item.libraryID, noteKey);
-          if (
-            obj &&
-            obj instanceof Zotero.Item &&
-            item.getNotes().includes(obj.id)
-          ) {
-            let str = obj.getNote();
-            if (str.startsWith("<p>TL;DR</p>\n<p>")) {
-              str = str.slice("<p>TL;DR</p>\n<p>".length);
-            }
-            if (str.endsWith("</p>")) {
-              str = str.slice(0, -4);
-            }
-            return str;
-          }
-        }
-        return "";
-      },
-      {
-        editable: true,
-        setFieldHook: (field, value, loadIn, item, original) => {
-          (async () => {
-            await tldrs.modify((data: any) => {
-              data[item.id] = value;
-              return data;
-            });
-            ztoolkit.ItemBox.refresh();
-          })();
-          return true;
-        },
-        index: 2,
-        multiline: true,
-      },
-    );
   }
 }

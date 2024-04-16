@@ -1,4 +1,4 @@
 itemPaneSection-header =
-    .label = 翻译
+    .label = TLDR
 itemPaneSection-sidenav =
-    .tooltiptext = 翻译
+    .tooltiptext = TLDR
