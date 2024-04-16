@@ -12,6 +12,14 @@ async function onStartup() {
     Zotero.unlockPromise,
     Zotero.uiReadyPromise,
   ]);
+
+  // TODO: Remove this after zotero#3387 is merged
+  if (__env__ === "development") {
+    // Keep in sync with the scripts/startup.mjs
+    const loadDevToolWhen = `Plugin ${config.addonID} startup`;
+    ztoolkit.log(loadDevToolWhen);
+  }
+
   initLocale();
 
   await tldrs.getAsync();
@@ -24,8 +32,6 @@ async function onStartup() {
 async function onMainWindowLoad(win: Window): Promise<void> {
   // Create ztoolkit for every window
   addon.data.ztoolkit = createZToolkit();
-
-  await Zotero.Promise.delay(1000);
 
   UIFactory.registerRightClickMenuItem();
 
@@ -158,11 +164,9 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
         ztoolkit.ItemBox.refresh();
         popupWin.changeLine({
           progress: (index * 100) / count,
-          text: `${getString("popWindow-waiting")}: ${
-            count - index - 1
-          }; ${getString("popWindow-succeed")}: ${
-            succeedItems.length
-          }; ${getString("popWindow-failed")}: ${failedItems.length}`,
+          text: `${getString("popWindow-waiting")}: ${count - index - 1
+            }; ${getString("popWindow-succeed")}: ${succeedItems.length
+            }; ${getString("popWindow-failed")}: ${failedItems.length}`,
         });
       }
     })();
@@ -171,9 +175,8 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
       popupWin.changeLine({
         type: "success",
         progress: 100,
-        text: `${getString("popWindow-succeed")}: ${
-          succeedItems.length
-        }; ${getString("popWindow-failed")}: ${failedItems.length}`,
+        text: `${getString("popWindow-succeed")}: ${succeedItems.length
+          }; ${getString("popWindow-failed")}: ${failedItems.length}`,
       });
       popupWin.startCloseTimer(3000);
     })();
@@ -182,7 +185,7 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
 
 // Add your hooks here. For element click, etc.
 // Keep in mind hooks only do dispatch. Don't add code that does real jobs in hooks.
-// Otherwise the code would be hard to read and maintian.
+// Otherwise the code would be hard to read and maintain.
 
 export default {
   onStartup,
