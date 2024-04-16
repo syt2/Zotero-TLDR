@@ -115,7 +115,7 @@
   },
   "release-it": {
     "git": {
-      "tagName": "v${version}"
+      "tagName": "V${version}"
     },
     "npm": {
       "publish": false
