@@ -168,9 +168,11 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
         ztoolkit.ItemBox.refresh();
         popupWin.changeLine({
           progress: (index * 100) / count,
-          text: `${getString("popWindow-waiting")}: ${count - index - 1
-            }; ${getString("popWindow-succeed")}: ${succeedItems.length
-            }; ${getString("popWindow-failed")}: ${failedItems.length}`,
+          text: `${getString("popWindow-waiting")}: ${
+            count - index - 1
+          }; ${getString("popWindow-succeed")}: ${
+            succeedItems.length
+          }; ${getString("popWindow-failed")}: ${failedItems.length}`,
         });
       }
     })();
@@ -179,8 +181,9 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
       popupWin.changeLine({
         type: "success",
         progress: 100,
-        text: `${getString("popWindow-succeed")}: ${succeedItems.length
-          }; ${getString("popWindow-failed")}: ${failedItems.length}`,
+        text: `${getString("popWindow-succeed")}: ${
+          succeedItems.length
+        }; ${getString("popWindow-failed")}: ${failedItems.length}`,
       });
       popupWin.startCloseTimer(3000);
     })();

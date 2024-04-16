@@ -93,7 +93,7 @@ export class UIFactory {
         }
       }
       return "";
-    }
+    };
     Zotero.ItemPaneManager.registerSection({
       paneID: config.addonRef,
       pluginID: config.addonID,
@@ -107,7 +107,9 @@ export class UIFactory {
       },
       onRender: ({ body, item }: any) => {
         let tldr = itemTLDR(item);
-        if (tldr.length <= 0 && item.parentItem) { tldr = itemTLDR(item.parentItem); }
+        if (tldr.length <= 0 && item.parentItem) {
+          tldr = itemTLDR(item.parentItem);
+        }
         body.textContent = tldr;
       },
     });
