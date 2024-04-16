@@ -73,6 +73,46 @@ export class UIFactory {
 
   // tldr行
   static async registerTLDRItemBoxRow() {
+    const registeredID = Zotero.ItemPaneManager.registerSection({
+      paneID: config.addonRef,
+      pluginID: config.addonID,
+      header: {
+        l10nID: `${config.addonRef}-itemPaneSection-header`,
+        icon: `chrome://${config.addonRef}/content/icons/favicon@16.png`,
+      },
+      sidenav: {
+        l10nID: `${config.addonRef}-itemPaneSection-sidenav`,
+        icon: `chrome://${config.addonRef}/content/icons/favicon@20.png`,
+      },
+      onRender: ({ body, item, editable, tabType }: any) => {
+        const noteKey = tldrs.get()[item.key];
+        let str = "";
+        if (noteKey) {
+          const obj = Zotero.Items.getByLibraryAndKey(item.libraryID, noteKey);
+          if (
+            obj &&
+            obj instanceof Zotero.Item &&
+            item.getNotes().includes(obj.id)
+          ) {
+            str = obj.getNote();
+            if (str.startsWith("<p>TL;DR</p>\n<p>")) {
+              str = str.slice("<p>TL;DR</p>\n<p>".length);
+            }
+            if (str.endsWith("</p>")) {
+              str = str.slice(0, -4);
+            }
+          }
+        }
+        body.textContent = str;
+        // body.textContent
+        //   = JSON.stringify({
+        //     id: item?.id,
+        //     editable,
+        //     tabType,
+        //   });
+      },
+    });
+    return;
     await ztoolkit.ItemBox.register(
       "TLDR",
       getString("itembox-tldrlabel"),
