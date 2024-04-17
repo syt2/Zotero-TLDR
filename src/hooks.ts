@@ -165,7 +165,6 @@ function onUpdateItems(items: Zotero.Item[], forceFetch: boolean = false) {
           ? succeedItems.push(item)
           : failedItems.push(item);
         await Zotero.Promise.delay(50);
-        ztoolkit.ItemBox.refresh();
         popupWin.changeLine({
           progress: (index * 100) / count,
           text: `${getString("popWindow-waiting")}: ${

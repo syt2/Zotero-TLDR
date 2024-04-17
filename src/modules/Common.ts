@@ -41,7 +41,7 @@ export class RegisterFactory {
 export class UIFactory {
   // item右键菜单
   static registerRightClickMenuItem() {
-    const menuIcon = `chrome://${config.addonRef}/content/icons/favicon@0.5x.png`;
+    const menuIcon = `chrome://${config.addonRef}/content/icons/favicon.png`;
     // item menuitem with icon
     ztoolkit.Menu.register("item", {
       tag: "menuitem",
@@ -57,7 +57,7 @@ export class UIFactory {
 
   // collection右键菜单
   static registerRightClickCollectionMenuItem() {
-    const menuIcon = `chrome://${config.addonRef}/content/icons/favicon@0.5x.png`;
+    const menuIcon = `chrome://${config.addonRef}/content/icons/favicon.png`;
     ztoolkit.Menu.register("collection", {
       tag: "menuitem",
       id: "zotero-collectionmenu-tldr",
