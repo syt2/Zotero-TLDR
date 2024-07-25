@@ -99,7 +99,7 @@ function onLoad() {
     for (const lib of Zotero.Libraries.getAll()) {
       needFetchItems = needFetchItems.concat(
         (await Zotero.Items.getAll(lib.id)).filter((item: Zotero.Item) => {
-          return item.isRegularItem() && !item.isCollection();
+          return item.isRegularItem();
         }),
       );
     }

@@ -13,7 +13,7 @@ export class TLDRFetcher {
 
   constructor(item: Zotero.Item) {
     this.zoteroItem = item;
-    if (item.isRegularItem() && !item.isCollection()) {
+    if (item.isRegularItem()) {
       this.title = item.getField("title") as string;
       this.abstract = item.getField("abstractNote") as string;
     }
